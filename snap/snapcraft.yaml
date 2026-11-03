@@ -1,0 +1,98 @@
+name: ab-connect
+title: ab-connect
+version: 1.0.3
+summary: Allen-Bradley Logix tags in the ctrlX Data Layer, selected in a web UI
+description: |
+  Browse the tags of ControlLogix / CompactLogix controllers level by level in a web UI and
+  select the ones you need. Selected tags appear as typed nodes in the ctrlX Data Layer under
+  ab-connect/<controller>/..., read cyclically at a chosen rate (batched per rate) or on request,
+  and optionally writable. The selection is stored in the app data of the active configuration
+  and registered again at startup without waiting for the PLC.
+base: core24
+confinement: strict
+grade: stable
+
+platforms:
+  amd64:
+  arm64:
+    build-on: [amd64, arm64]
+    build-for: [arm64]
+
+apps:
+  ab-connect:
+    command: bin/run.sh
+    environment:
+      LD_LIBRARY_PATH: $SNAP/usr/lib
+    plugs:
+      - network
+      - network-bind
+      - datalayer
+      - active-solution
+    slots:
+      - package-assets
+      - package-run
+    daemon: simple
+    restart-condition: always
+    passthrough:
+      restart-delay: 10s
+
+parts:
+  ab-connect:
+    plugin: python
+    source: .
+
+  # Bundle libcomm_datalayer from the SDK .deb (both arches are inside it; keep only the target one)
+  datalayer:
+    plugin: nil
+    source: deb/ctrlx-datalayer-3.5.2.deb
+    source-type: deb
+    override-build: |
+      mkdir -p $CRAFT_PART_INSTALL/usr/lib
+      cp -a usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libcomm_datalayer.so* $CRAFT_PART_INSTALL/usr/lib/
+
+  www:
+    plugin: dump
+    source: www/
+    organize:
+      "*": www/
+
+  configs:
+    plugin: dump
+    source: ./configs
+    organize:
+      "package-assets/*": package-assets/${CRAFT_PROJECT_NAME}/
+
+  wrapper-scripts:
+    plugin: dump
+    source: wrapper/
+    organize:
+      ./run.sh : bin/run.sh
+
+slots:
+  package-assets:
+    interface: content
+    content: package-assets
+    source:
+      read:
+        - $SNAP/package-assets/${CRAFT_PROJECT_NAME}
+  package-run:
+    interface: content
+    content: package-run
+    source:
+      write:
+        - $SNAP_DATA/package-run/${CRAFT_PROJECT_NAME}
+
+plugs:
+  datalayer:
+    interface: content
+    content: datalayer
+    target: $SNAP_DATA/.datalayer
+  active-solution:
+    interface: content
+    content: solutions
+    target: $SNAP_COMMON/solutions
+
+lint:
+  ignore:
+    - library:
+        - usr/lib/libcomm_datalayer.so.*

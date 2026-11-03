@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.boschrexroth.com/ctrlx-automation/ctrlx-core/apps/package-manifest/package-manifest.v1.6.schema.json",
+  "version": "1.0.0",
+  "id": "ab-connect",
+  "services": {
+    "proxyMapping": [
+      {
+        "name": "ab-connect.web",
+        "url": "/ab-connect",
+        "binding": "unix://{$SNAP_DATA}/package-run/ab-connect/web.sock",
+        "restricted": [
+          "/ab-connect/api"
+        ]
+      }
+    ]
+  },
+  "menus": {
+    "sidebar": [
+      {
+        "id": "ab-connect",
+        "title": "ab-connect",
+        "icon": "bosch-ic-connectivity",
+        "link": "/ab-connect/?token=${bearertoken}",
+        "target": "embedded",
+        "items": []
+      }
+    ],
+    "overview": [
+      {
+        "id": "ab-connect",
+        "title": "ab-connect",
+        "description": "Allen-Bradley Logix tags in the ctrlX Data Layer",
+        "icon": "bosch-ic-connectivity",
+        "link": "/ab-connect/?token=${bearertoken}"
+      }
+    ]
+  },
+  "commands": {
+    "activeConfiguration": {
+      "load": [
+        {
+          "id": "ab-connect",
+          "subject": "Allen-Bradley tag selection",
+          "url": "/ab-connect/api/v1/admin/cfg/load"
+        }
+      ],
+      "save": [
+        {
+          "id": "ab-connect",
+          "subject": "Allen-Bradley tag selection",
+          "url": "/ab-connect/api/v1/admin/cfg/save"
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "appDirectories": [
+      {
+        "name": "ab-connect",
+        "description": "ab-connect controllers and selected tags",
+        "icon": "bosch-ic-connectivity",
+        "copyOnLoad": true,
+        "writeProtected": false
+      }
+    ],
+    "appPrivateFiles": [
+      "^ab-connect/.*\\.tmp$"
+    ]
+  }
+}

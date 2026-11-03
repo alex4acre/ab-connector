@@ -1,0 +1,10 @@
+# build outputs (delivered copies are in the shared folder)
+*.snap
+parts/
+stage/
+prime/
+.craft/
+# Python caches
+__pycache__/
+*.pyc
+build.log

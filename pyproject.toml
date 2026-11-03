@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ab-connect"
+version = "1.0.3"
+description = "Allen-Bradley Logix tags in the ctrlX Data Layer, selected in a web UI"
+requires-python = ">=3.10"
+dependencies = [
+    "ctrlx-datalayer<=3.6",
+    "ctrlx-fbs",
+    "pycomm3==1.2.16"
+]
+
+[project.scripts]
+app-main = "app.main:main"
+
+[tool.setuptools]
+packages = ["app"]

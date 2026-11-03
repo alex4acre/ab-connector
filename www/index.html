@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ab-connect</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ab-connect</h1>
+    <span class="hint">Allen-Bradley Logix tags in the ctrlX Data Layer</span>
+  </header>
+  <p id="banner" class="banner" hidden></p>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="row"><h2>Controllers</h2><button id="add-controller" type="button" class="small push">+ Add</button></div>
+      <ul id="controller-list" class="controller-list"></ul>
+      <form id="controller-form" class="card form" hidden>
+        <label>Name <input id="cf-name" maxlength="64" placeholder="Line1" required></label>
+        <label>Address <input id="cf-address" placeholder="192.168.1.21 or 192.168.1.21/0" required></label>
+        <p class="hint">IP address; for a ControlLogix chassis add the CPU slot, e.g. <code>192.168.1.21/2</code>.</p>
+        <div class="row">
+          <button id="cf-cancel" type="button" class="small secondary push">Cancel</button>
+          <button type="submit" class="small">Add</button>
+        </div>
+        <div class="find">
+          <div class="row">
+            <button id="cf-discover" type="button" class="small secondary">Find on network</button>
+          </div>
+          <div class="row">
+            <input id="cf-range" placeholder="Range: 192.168.1.0/24" title="Asks every address in the range directly - for networks a broadcast doesn't reach">
+            <button id="cf-scan" type="button" class="small secondary">Scan</button>
+          </div>
+          <p id="searched" class="hint"></p>
+          <ul id="discovered" class="discovered"></ul>
+        </div>
+      </form>
+      <section id="controller-detail" class="card" hidden>
+        <div class="row"><strong id="cd-name"></strong><span id="cd-state" class="chip push"></span></div>
+        <dl id="cd-info" class="info"></dl>
+        <table id="cd-groups" class="groups"></table>
+        <div class="row wrap">
+          <button id="cd-refresh" type="button" class="small secondary" title="Upload the tag definitions again, e.g. after a program download">Reload tag definitions</button>
+          <button id="cd-toggle" type="button" class="small secondary"></button>
+          <button id="cd-remove" type="button" class="small danger">Remove</button>
+        </div>
+      </section>
+    </aside>
+    <div id="resizer" class="resizer" role="separator" aria-orientation="vertical" aria-label="Resize the controller pane"
+         tabindex="0" title="Drag to resize · double-click to reset"></div>
+
+    <main>
+      <nav class="tabs">
+        <button type="button" class="tab active" data-view="browse">Browse</button>
+        <button type="button" class="tab" data-view="selected">Selected tags <span id="selected-count" class="count"></span></button>
+      </nav>
+
+      <section id="view-browse" class="view">
+        <div class="options row wrap">
+          <span class="hint">Add with:</span>
+          <label class="inline">Mode
+            <select id="opt-mode"><option value="cyclic">Cyclic</option><option value="on-request">On request</option></select>
+          </label>
+          <label class="inline">Rate <input id="opt-rate" type="number" min="50" step="10" value="500"> ms</label>
+          <label class="inline"><input id="opt-writable" type="checkbox"> Writable from the Data Layer</label>
+          <span id="rate-warning" class="warn" hidden>Rates below 100 ms load the PLC's communication heavily.</span>
+        </div>
+        <div class="browse">
+          <div id="tree" class="tree"><p class="hint">Choose a controller.</p></div>
+          <aside class="preview">
+            <h3>Value</h3>
+            <div id="preview" class="hint">Click the eye icon on a tag to read its current value.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-selected" class="view" hidden>
+        <div class="row">
+          <span class="hint">Data Layer path: <code>ab-connect/<span id="sel-controller"></span>/…</code></span>
+          <button id="remove-selected" type="button" class="small danger push" disabled>Remove checked</button>
+        </div>
+        <div class="scroll"><table id="tag-table" class="tags"></table></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
